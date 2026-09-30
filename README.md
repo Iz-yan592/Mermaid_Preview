@@ -97,8 +97,6 @@ npx serve .
   - 移動（パン）を担当する `transformWrapper`（`calc(-50% + translateX, calc(-50% + translateY))`）と、拡縮を担当する `scaleWrapper`（`scale(...)`）を分離した 2 階層 Transform 設計。
 - **セキュリティ**:
   - `mermaid.initialize({ securityLevel: 'strict' })` による厳格な XSS 保護。
-  - 完全クライアントサイド実行（入力した図のデータが外部サーバーへ送信されることはありません）。
-
 ---
 
 ## 📂 ディレクトリ構成
