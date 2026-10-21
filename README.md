@@ -100,7 +100,7 @@ Mermaid.js がサポートする主要なダイアグラム形式をそのまま
 
 ---
 
-##  付録
+##  付録　Geminiとの対話をログとして可視化するプロンプト
 
 Prompt_Trajectory_of_daialogue_search(2-layer_structhre_index_annnotation)
 Geminiとの対話をログとして可視化するプロンプトです。
