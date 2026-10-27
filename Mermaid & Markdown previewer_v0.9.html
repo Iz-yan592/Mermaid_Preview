@@ -6,10 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mermaid & Markdown プレビューア</title>
 
-  <!-- Tailwind CSS CDN (Typography プラグイン付き) -->
+  <!-- Tailwind CSS CDN (v3 Play CDN / Typography プラグイン付き) -->
+  <!-- ※ integrity なし: cdn.tailwindcss.com は CORS ヘッダーを返さないため crossorigin 付きでは読み込めない -->
   <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
   <script>
     // dark: バリアントを data-theme="dark" に連動させる（Play CDN 設定）
+    // ※ Tailwind 本体が読み込めていない場合は何もしない
     if (typeof tailwind !== 'undefined') {
       tailwind.config = {
         darkMode: ['selector', '[data-theme="dark"]']
@@ -17,14 +19,20 @@
     }
   </script>
 
-  <!-- Mermaid.js v11 -->
-  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  <!-- Mermaid.js -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11.17.2/dist/mermaid.min.js"
+    integrity="sha384-EOXBFmc3gx5mb+vn0vPvvGqACToJD24hhacX5Yx+8NUUQrHIle/Qi5Bg9o3zKwW2"
+    crossorigin="anonymous"></script>
 
   <!-- Marked.js (Markdown パーサー) -->
-  <script src="https://cdn.jsdelivr.net/npm/marked@15.0.7/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@15.0.7/marked.min.js"
+    integrity="sha384-H+hy9ULve6xfxRkWIh/YOtvDdpXgV2fmAGQkIDTxIgZwNoaoBal14Di2YTMR6MzR"
+    crossorigin="anonymous"></script>
 
   <!-- DOMPurify (XSS サニタイザー) -->
-  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.4/dist/purify.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.4/dist/purify.min.js"
+    integrity="sha384-eEu5CTj3qGvu9PdJuS+YlkNi7d2XxQROAFYOr59zgObtlcux1ae1Il3u7jvdCSWu"
+    crossorigin="anonymous"></script>
 
   <style>
     /* テキストエリア・プレビューのスクロールバー */
@@ -290,7 +298,7 @@
           <div class="flex items-center gap-1.5">
             <button type="button" id="pasteBtn"
               class="text-xs text-slate-600 hover:text-indigo-600 font-medium px-2 py-1 rounded hover:bg-slate-200 transition-colors"
-              title="クリップボードから貼り付け（自動モード判別）">
+              title="クリップボードから全文貼り付け（自動モード判別）">
               ペースト
             </button>
 
@@ -304,7 +312,7 @@
 
         <div class="relative flex-1">
           <textarea id="editorInput" spellcheck="false"
-            placeholder="# タイトル&#10;&#10;ここにMarkdownを入力...&#10;&#10;```mermaid&#10;graph TD&#10;    A --> B&#10;```"
+            placeholder="# タイトル\n\nここにMarkdownを入力...\n\n```mermaid\ngraph TD\n    A --> B\n```"
             class="w-full h-full min-h-[220px] p-3.5 font-mono text-xs sm:text-sm text-slate-800 bg-transparent resize-y md:resize-none focus:outline-none leading-relaxed"
             aria-label="テキスト入力エリア"></textarea>
         </div>
@@ -635,8 +643,8 @@ sequenceDiagram
 | :--- | :--- | :---: | :--- |
 | **Mermaid 単体** | パン・ズーム、PNG/SVG画像出力 | ✅ | 高解像度Canvas出力 |
 | **Markdown 統合** | 見出し、表、リスト、Mermaid図のインライン描画 | ✅ | GFMテーブル対応 |
-| **スマート判別** | ペースト時にMermaidかMarkdownかを自動判定 | ✅ | ワンタッチ切り替え |
-| **安全保護** | DOMPurify による厳格サニタイズ | ✅ | XSS完全防御 |
+| **スマート判別** | ペースト時にMermaidかMarkdownかを自動判定 | ✅ | 単一ブロックのフェンス自動除去対応 |
+| **安全保護** | DOMPurify による最小権限サニタイズ | ✅ | XSS / CSS Injection防御 |
 
 > 💡 **Tip**: 入力欄の内容はブラウザ（LocalStorage）に自動保存されます。`,
 
@@ -716,7 +724,6 @@ graph LR
     let isSideBySide = false;
 
     let debounceTimer = null;
-    let resizeTimer = null;
     let renderVersion = 0;
     let renderCount = 0;
     let isInitialRender = true;
@@ -750,6 +757,37 @@ graph LR
     }
 
     // ============================================================
+    // 汎用クリップボードコピー関数（HTTPS & file:// 両対応）
+    // ============================================================
+
+    async function writeToClipboard(text, successMsg) {
+      if (navigator.clipboard && window.isSecureContext) {
+        try {
+          await navigator.clipboard.writeText(text);
+          showToast(successMsg);
+          return true;
+        } catch (_) { }
+      }
+
+      const tempArea = document.createElement('textarea');
+      tempArea.value = text;
+      tempArea.style.position = 'fixed';
+      tempArea.style.opacity = '0';
+      document.body.appendChild(tempArea);
+      tempArea.select();
+      try {
+        document.execCommand('copy');
+        showToast(successMsg);
+        document.body.removeChild(tempArea);
+        return true;
+      } catch (_) {
+        showToast('コピーに失敗しました');
+        document.body.removeChild(tempArea);
+        return false;
+      }
+    }
+
+    // ============================================================
     // Mermaid 残留DOMクリーンアップ
     // ============================================================
 
@@ -761,7 +799,7 @@ graph LR
     }
 
     // ============================================================
-    // Marked.js 15.0+ 完全準拠設定 & URL ホワイトリスト検証
+    // Marked.js 15.0+ 完全準拠設定（プレーンオブジェクト拡張）
     // ============================================================
 
     function escapeHtml(str) {
@@ -774,21 +812,11 @@ graph LR
         .replace(/'/g, '&#039;');
     }
 
-    function isSafeHref(value) {
-      if (!value) return false;
-      const trimmed = String(value).trim();
-      if (trimmed.startsWith('#')) return true;
-      try {
-        const url = new URL(trimmed, window.location.href);
-        return ['http:', 'https:', 'mailto:'].includes(url.protocol);
-      } catch {
-        return false;
-      }
-    }
-
     let mdMermaidCounter = 0;
 
+    // ============================================================
     // CDN 読み込みガード: ライブラリ欠落時はアプリ全体を止めない
+    // ============================================================
     const missingLibs = [];
     if (typeof mermaid === 'undefined') missingLibs.push('mermaid');
     if (typeof marked === 'undefined') missingLibs.push('marked');
@@ -806,23 +834,16 @@ graph LR
         gfm: true,
         breaks: true,
         renderer: {
-          html(token) {
-            // 生のHTMLタグ（<style>や<script>等）のインジェクションを無効化
-            const raw = (token && token.text) ? token.text : '';
-            return escapeHtml(raw);
-          },
-
           link(token) {
             const href = (token && token.href) ? token.href : '';
-            const innerHtml = (token && token.tokens)
-              ? this.parser.parseInline(token.tokens)
-              : escapeHtml((token && token.text) ? token.text : '');
+            const text = (token && token.text) ? token.text : '';
             const title = (token && token.title) ? ` title="${escapeHtml(token.title)}"` : '';
 
-            if (!isSafeHref(href)) {
-              return `<span>${innerHtml}</span>`;
+            const cleanHref = href.trim().toLowerCase();
+            if (cleanHref.startsWith('javascript:') || cleanHref.startsWith('vbscript:') || cleanHref.startsWith('data:')) {
+              return `<span>${escapeHtml(text)}</span>`;
             }
-            return `<a href="${escapeHtml(href)}"${title} target="_blank" rel="noopener noreferrer">${innerHtml}</a>`;
+            return `<a href="${escapeHtml(href)}"${title} target="_blank" rel="noopener noreferrer">${text}</a>`;
           },
 
           code(token) {
@@ -834,9 +855,10 @@ graph LR
               const cardId = `md-mermaid-card-${Date.now()}-${mdMermaidCounter}`;
               const outputId = `md-mermaid-output-${Date.now()}-${mdMermaidCounter}`;
 
+              // Tailwind v3 CDN 準拠クラス (backdrop-blur-sm, shadow-sm) を使用
               return `
                 <div class="not-prose markdown-mermaid-card group relative" id="${cardId}">
-                  <div class="card-action-bar absolute top-2.5 right-2.5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 bg-white/90 dark:bg-slate-800/90 backdrop-blur-xs p-1 rounded-md border border-slate-200 dark:border-slate-700 shadow-xs z-10">
+                  <div class="card-action-bar absolute top-2.5 right-2.5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm p-1 rounded-md border border-slate-200 dark:border-slate-700 shadow-sm z-10">
                     <button type="button" class="inline-svg-copy-btn text-[11px] px-1.5 py-0.5 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium rounded hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors" data-target="${outputId}" title="この図のSVGをコピー">SVGコピー</button>
                   </div>
                   <div class="inline-block text-left mermaid-diagram" id="${outputId}" data-card-id="${cardId}" data-code="${encodeURIComponent(code)}"></div>
@@ -848,35 +870,10 @@ graph LR
           }
         }
       });
-    }
-
-    // 汎用クリップボードコピー関数（HTTPS & file:// フォールバック対応）
-    async function copyTextToClipboard(text, successMsg) {
-      if (navigator.clipboard && window.isSecureContext) {
-        try {
-          await navigator.clipboard.writeText(text);
-          showToast(successMsg);
-          return;
-        } catch (_) { }
-      }
-
-      const tempArea = document.createElement('textarea');
-      tempArea.value = text;
-      tempArea.style.position = 'fixed';
-      tempArea.style.opacity = '0';
-      document.body.appendChild(tempArea);
-      tempArea.select();
-      try {
-        document.execCommand('copy');
-        showToast(successMsg);
-      } catch (_) {
-        showToast('コピーに失敗しました');
-      }
-      document.body.removeChild(tempArea);
-    }
+    } // end: CDN ガード（marked.use）
 
     // インライン図のSVGコピー
-    function copyInlineSvg(nodeId) {
+    async function copyInlineSvg(nodeId) {
       const container = document.getElementById(nodeId);
       const svg = container ? container.querySelector('svg') : null;
       if (!svg) {
@@ -884,7 +881,7 @@ graph LR
         return;
       }
       const svgData = new XMLSerializer().serializeToString(svg);
-      copyTextToClipboard(svgData, 'インライン図のSVGをコピーしました');
+      await writeToClipboard(svgData, 'インライン図のSVGをコピーしました');
     }
 
     markdownPreviewContainer.addEventListener('click', (e) => {
@@ -968,28 +965,60 @@ graph LR
     }
 
     // ============================================================
-    // スマートフォーマット自動判別
+    // スマートフォーマット自動判別（AI出力の単一フェンス自動除去対応）
     // ============================================================
+
+    const MERMAID_KEYWORDS = [
+      'graph', 'flowchart', 'sequencediagram', 'classdiagram',
+      'statediagram', 'statediagram-v2', 'erdiagram', 'gantt',
+      'pie', 'mindmap', 'gitgraph', 'timeline', 'quadrantchart',
+      'requirementdiagram', 'c4context', 'sankey-beta', 'xychart-beta',
+      'block-beta', 'packet-beta', 'kanban', 'architecture-beta'
+    ];
+
+    function startsWithMermaidKeyword(text) {
+      const lines = text.trim().split('\n');
+      for (const line of lines) {
+        const cleanLine = line.trim().toLowerCase();
+        // コメント行やディレクティブ（%%{init: ...}%%）はスキップして判定
+        if (!cleanLine || cleanLine.startsWith('%%')) continue;
+        return MERMAID_KEYWORDS.some(kw => cleanLine.startsWith(kw));
+      }
+      return false;
+    }
+
+    // 生成AIが出力した「単一の ```mermaid ... ``` ブロックのみ」を検出し中身を取り出す
+    function extractSingleMermaidBlock(text) {
+      const trimmed = text.trim();
+      const match = trimmed.match(/^```(?:mermaid)?[ \t]*\r?\n([\s\S]+?)\r?\n```$/i);
+      if (!match) return null;
+
+      const inner = match[1].trim();
+      // 内部にさらにコードフェンスが含まれている場合は複数のブロックなので除外
+      if (inner.includes('```')) return null;
+
+      if (/^```mermaid/i.test(trimmed) || startsWithMermaidKeyword(inner)) {
+        return inner;
+      }
+      return null;
+    }
 
     function detectContentMode(text) {
       const trimmed = text.trim();
       if (!trimmed) return null;
 
+      if (extractSingleMermaidBlock(trimmed)) {
+        return 'mermaid';
+      }
+
       if (trimmed.includes('```mermaid') || trimmed.includes('```') || /^#{1,6}\s+/m.test(trimmed) || /\|.+\|[\r\n]+\|[-:| ]+\|/m.test(trimmed)) {
         return 'markdown';
       }
 
-      const mermaidKeywords = [
-        'graph', 'flowchart', 'sequencediagram', 'classdiagram',
-        'statediagram', 'statediagram-v2', 'erdiagram', 'gantt',
-        'pie', 'mindmap', 'gitgraph', 'timeline', 'quadrantchart'
-      ];
-      const firstLine = trimmed.split('\n')[0].trim().toLowerCase();
-      for (const kw of mermaidKeywords) {
-        if (firstLine.startsWith(kw)) {
-          return 'mermaid';
-        }
+      if (startsWithMermaidKeyword(trimmed)) {
+        return 'mermaid';
       }
+
       return null;
     }
 
@@ -1186,7 +1215,7 @@ graph LR
 
     let retryCount = 0;
 
-    // Markdown内Mermaid図のSVGキャッシュ（FIFO/LRU管理）
+    // Markdown内Mermaid図のSVGキャッシュ（コード＋テーマをキーに、変更分のみ再描画）
     const mdSvgCache = new Map();
     const MD_SVG_CACHE_MAX = 200;
 
@@ -1265,17 +1294,12 @@ graph LR
         try {
           const rawHtml = marked.parse(code);
 
-          // セキュリティ改善: Mermaid描画前のHTMLサニタイズでは <style> や <foreignObject> を禁止し、
-          // プレースホルダー用の data-card-id, data-code, data-target 属性と button のみを安全に許可する
+          // DOMPurify 最小権限設定:
+          // MermaidのSVG本体はサニタイズ後に挿入されるため、ここではプレースホルダー維持と
+          // 安全な外部リンク属性のみを許可し、styleタグ等によるUI偽装・CSSインジェクションを遮断する
           const cleanHtml = DOMPurify.sanitize(rawHtml, {
-            ADD_TAGS: ['button', 'input'],
-            ADD_ATTR: [
-              'id', 'class', 'data-card-id', 'data-code', 'data-target',
-              'target', 'rel', 'title', 'align', 'colspan', 'rowspan',
-              'type', 'checked', 'disabled'
-            ],
-            FORBID_TAGS: ['script', 'style', 'iframe', 'object', 'embed', 'foreignObject'],
-            FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'srcdoc']
+            ADD_TAGS: ['button'],
+            ADD_ATTR: ['data-card-id', 'data-code', 'data-target', 'target', 'rel']
           });
 
           if (currentVersion !== renderVersion) return;
@@ -1295,19 +1319,16 @@ graph LR
           let errorCount = 0;
           setStatus('rendering', `図を描画中 (0/${totalDiagrams})...`);
 
-          let diagramIndex = 0;
           for (const node of mermaidNodes) {
             if (currentVersion !== renderVersion) return;
 
-            diagramIndex++;
             const diagramCode = decodeURIComponent(node.getAttribute('data-code') || '');
             const cardId = node.getAttribute('data-card-id');
             const cardElement = cardId ? document.getElementById(cardId) : node.closest('.markdown-mermaid-card');
 
             if (!diagramCode) continue;
 
-            // 同一文書内に同じ図が複数ある場合のSVG内ID重複を防ぐためインデックスもキーに含める
-            const cacheKey = `${currentTheme}:${diagramIndex}\n${diagramCode}`;
+            const cacheKey = currentTheme + '\n' + diagramCode;
             const cachedSvg = mdSvgCache.get(cacheKey);
 
             try {
@@ -1319,10 +1340,7 @@ graph LR
                 const diagramId = `md-mermaid-${Date.now()}-${renderCount}`;
                 const rendered = await mermaid.render(diagramId, diagramCode);
                 svg = rendered.svg;
-                if (mdSvgCache.size >= MD_SVG_CACHE_MAX) {
-                  const oldestKey = mdSvgCache.keys().next().value;
-                  mdSvgCache.delete(oldestKey);
-                }
+                if (mdSvgCache.size >= MD_SVG_CACHE_MAX) mdSvgCache.clear();
                 mdSvgCache.set(cacheKey, svg);
               }
               cleanupMermaidGarbage();
@@ -1438,8 +1456,6 @@ graph LR
     // ============================================================
 
     function switchMode(newMode, notify = true, preserveInput = false) {
-      clearTimeout(debounceTimer);
-
       if (!preserveInput) {
         if (currentMode === 'mermaid') {
           mermaidCode = editorInput.value;
@@ -1499,7 +1515,7 @@ graph LR
     modeMarkdownBtn.addEventListener('click', () => switchMode('markdown', true));
 
     // ============================================================
-    // テーマ & レイアウト & リサイズ連動
+    // テーマ & レイアウト
     // ============================================================
 
     function applyCanvasTheme(theme) {
@@ -1551,15 +1567,6 @@ graph LR
       }, 60);
     });
 
-    // ウィンドウリサイズ・画面回転時の自動フィット再計算
-    window.addEventListener('resize', () => {
-      if (currentMode !== 'mermaid') return;
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => {
-        fitToScreen();
-      }, 150);
-    });
-
     templateSelect.addEventListener('change', (e) => {
       const key = e.target.value;
       if (currentMode === 'mermaid') {
@@ -1583,8 +1590,48 @@ graph LR
     });
 
     // ============================================================
-    // エディタ操作 & エクスポート
+    // エディタ操作 & スマートペースト処理
     // ============================================================
+
+    // 全文貼り付け時の共通ハンドラ（単一Mermaidブロックのフェンス除去＋自動モード切替）
+    function applyFullTextPaste(rawText, notifyModeSwitch = true) {
+      const singleMermaid = extractSingleMermaidBlock(rawText);
+      if (singleMermaid) {
+        editorInput.value = singleMermaid;
+        mermaidCode = singleMermaid;
+        if (currentMode !== 'mermaid') {
+          switchMode('mermaid', false, true);
+        }
+        renderPreview().then(() => fitToScreen());
+        saveState();
+        showToast('Mermaidコードブロックを検出し、単体モードで展開しました');
+        return;
+      }
+
+      editorInput.value = rawText;
+      const detected = detectContentMode(rawText);
+
+      if (detected && detected !== currentMode) {
+        if (detected === 'mermaid') {
+          mermaidCode = rawText;
+        } else {
+          markdownCode = rawText;
+        }
+        switchMode(detected, notifyModeSwitch, true);
+        if (detected === 'mermaid') {
+          setTimeout(() => fitToScreen(), 50);
+        }
+      } else {
+        if (currentMode === 'mermaid') {
+          mermaidCode = rawText;
+          renderPreview().then(() => fitToScreen());
+        } else {
+          markdownCode = rawText;
+          renderPreview();
+        }
+      }
+      saveState();
+    }
 
     editorInput.addEventListener('input', scheduleRender);
 
@@ -1592,9 +1639,30 @@ graph LR
       const pasteData = (e.clipboardData || window.clipboardData).getData('text');
       if (!pasteData) return;
 
+      // エディタが空の状態、または全選択して全文を上書きするペーストかどうかを判定
+      const currentVal = editorInput.value;
+      const isReplacingAll =
+        currentVal.trim() === '' ||
+        (editorInput.selectionStart === 0 && editorInput.selectionEnd === currentVal.length);
+
+      // 一部追記（部分ペースト）の場合はモードの自動切替を行わず、通常のテキスト挿入に任せる
+      if (!isReplacingAll) return;
+
+      const singleMermaid = extractSingleMermaidBlock(pasteData);
+      if (singleMermaid) {
+        e.preventDefault();
+        applyFullTextPaste(pasteData, true);
+        return;
+      }
+
       const detected = detectContentMode(pasteData);
       if (detected && detected !== currentMode) {
-        setTimeout(() => switchMode(detected, true, true), 0);
+        setTimeout(() => {
+          switchMode(detected, true, true);
+          if (detected === 'mermaid') {
+            setTimeout(() => fitToScreen(), 50);
+          }
+        }, 0);
       }
     });
 
@@ -1666,14 +1734,14 @@ graph LR
     zoomResetBtn.addEventListener('click', resetView);
     fitBtn.addEventListener('click', fitToScreen);
 
-    copySvgBtn.addEventListener('click', () => {
+    copySvgBtn.addEventListener('click', async () => {
       const svgElement = mermaidOutput.querySelector('svg');
       if (!svgElement) {
         showToast('コピー可能な図がありません');
         return;
       }
       const svgData = new XMLSerializer().serializeToString(svgElement);
-      copyTextToClipboard(svgData, 'SVGコードをクリップボードにコピーしました');
+      await writeToClipboard(svgData, 'SVGコードをクリップボードにコピーしました');
     });
 
     downloadSvgBtn.addEventListener('click', () => {
@@ -1692,12 +1760,13 @@ graph LR
       downloadLink.click();
       document.body.removeChild(downloadLink);
 
+      // Android対策: すぐにURLを破棄せず、ダウンロード完了を待つタイムラグを設ける
       setTimeout(() => URL.revokeObjectURL(url), 1000);
       showToast('SVG画像をダウンロードしました');
     });
 
     // ============================================================
-    // 堅牢なPNG画像エクスポート処理 (SVG -> Canvas 変換)
+    // 堅牢なPNG画像エクスポート処理 (SVG -> Canvas 余白付き変換)
     // ============================================================
     downloadPngBtn.addEventListener('click', () => {
       const svgElement = mermaidOutput.querySelector('svg');
@@ -1706,49 +1775,48 @@ graph LR
         return;
       }
 
-      let width = 0;
-      let height = 0;
+      let svgW = 0;
+      let svgH = 0;
 
       if (svgElement.viewBox && svgElement.viewBox.baseVal && svgElement.viewBox.baseVal.width > 0) {
-        width = svgElement.viewBox.baseVal.width;
-        height = svgElement.viewBox.baseVal.height;
+        svgW = svgElement.viewBox.baseVal.width;
+        svgH = svgElement.viewBox.baseVal.height;
       } else {
         try {
           const bbox = svgElement.getBBox();
-          width = bbox.width;
-          height = bbox.height;
+          svgW = bbox.width;
+          svgH = bbox.height;
         } catch (_) { }
       }
 
-      if (!width || !height) {
+      if (!svgW || !svgH) {
         const rect = svgElement.getBoundingClientRect();
-        width = rect.width / (scale || 1);
-        height = rect.height / (scale || 1);
+        svgW = rect.width / (scale || 1);
+        svgH = rect.height / (scale || 1);
       }
 
-      if (!width || !height) {
-        width = 800;
-        height = 600;
+      if (!svgW || !svgH) {
+        svgW = 800;
+        svgH = 600;
       }
 
-      width = Math.ceil(width) + 16;
-      height = Math.ceil(height) + 16;
+      svgW = Math.ceil(svgW);
+      svgH = Math.ceil(svgH);
+      const margin = 20;
 
       const clonedSvg = svgElement.cloneNode(true);
-
       clonedSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
       clonedSvg.setAttribute('xmlns:xhtml', 'http://www.w3.org/1999/xhtml');
-      clonedSvg.setAttribute('width', width + 'px');
-      clonedSvg.setAttribute('height', height + 'px');
+      clonedSvg.setAttribute('width', svgW + 'px');
+      clonedSvg.setAttribute('height', svgH + 'px');
 
+      const bgColor = currentTheme === 'dark' ? '#0f172a' : '#ffffff';
       const style = document.createElement('style');
-      style.textContent = `
-        svg { background-color: ${currentTheme === 'dark' ? '#0f172a' : '#ffffff'}; font-family: sans-serif; }
-      `;
+      style.textContent = `svg { background-color: ${bgColor}; font-family: sans-serif; }`;
       clonedSvg.insertBefore(style, clonedSvg.firstChild);
 
       let svgData = new XMLSerializer().serializeToString(clonedSvg);
-      svgData = svgData.replace(/<br>/gi, '<br/>');
+      svgData = svgData.replace(/<br\s*>/gi, '<br/>');
 
       const encodedData = encodeURIComponent(svgData)
         .replace(/'/g, '%27')
@@ -1759,15 +1827,25 @@ graph LR
       img.crossOrigin = 'anonymous';
 
       img.onload = () => {
-        const scaleFactor = 2;
+        const scaleFactor = 2; // 高解像度出力 (2x)
+        const totalW = svgW + margin * 2;
+        const totalH = svgH + margin * 2;
+
         const canvas = document.createElement('canvas');
-        canvas.width = width * scaleFactor;
-        canvas.height = height * scaleFactor;
+        canvas.width = totalW * scaleFactor;
+        canvas.height = totalH * scaleFactor;
 
         const ctx = canvas.getContext('2d');
-        ctx.fillStyle = currentTheme === 'dark' ? '#0f172a' : '#ffffff';
+        ctx.fillStyle = bgColor;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        // Canvas上で周囲に均等なマージンを確保して描画
+        ctx.drawImage(
+          img,
+          margin * scaleFactor,
+          margin * scaleFactor,
+          svgW * scaleFactor,
+          svgH * scaleFactor
+        );
 
         canvas.toBlob((blob) => {
           if (!blob) {
@@ -1794,21 +1872,22 @@ graph LR
       img.src = dataUrl;
     });
 
-    // プレビューHTMLコピー（ホバー用アクションバーを除去したクリーンなHTMLを取得）
-    copyHtmlBtn.addEventListener('click', () => {
-      if (!markdownPreviewContainer.innerHTML.trim()) {
+    // プレビューHTMLコピー（UI用ボタンや内部管理用の属性を除去してクリーンなHTMLを出力）
+    copyHtmlBtn.addEventListener('click', async () => {
+      if (!markdownPreviewContainer.innerHTML || !editorInput.value.trim()) {
         showToast('コピー可能なプレビューがありません');
         return;
       }
 
       const clone = markdownPreviewContainer.cloneNode(true);
       clone.querySelectorAll('.card-action-bar').forEach(el => el.remove());
-      clone.querySelectorAll('[data-code]').forEach(el => {
+      clone.querySelectorAll('[data-code], [data-card-id]').forEach(el => {
         el.removeAttribute('data-code');
         el.removeAttribute('data-card-id');
       });
 
-      copyTextToClipboard(clone.innerHTML.trim(), 'プレビューHTMLコードをコピーしました');
+      const cleanHtmlContent = clone.innerHTML.trim();
+      await writeToClipboard(cleanHtmlContent, 'プレビューHTMLコードをコピーしました');
     });
 
     downloadMdBtn.addEventListener('click', () => {
@@ -1855,21 +1934,10 @@ graph LR
         }
 
         if (text) {
-          editorInput.value = text;
-          const detected = detectContentMode(text);
-          if (detected && detected !== currentMode) {
-            switchMode(detected, false, true);
-          } else {
-            if (currentMode === 'mermaid') {
-              mermaidCode = text;
-              renderPreview().then(() => fitToScreen());
-            } else {
-              markdownCode = text;
-              renderPreview();
-            }
+          applyFullTextPaste(text, false);
+          if (!extractSingleMermaidBlock(text)) {
+            showToast('貼り付けました');
           }
-          saveState();
-          showToast('貼り付けました');
         }
       } catch (_) {
         editorInput.focus();
