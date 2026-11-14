@@ -4,8 +4,10 @@
   "description": "ブラウザ単体で軽快に動作する、**Mermaidダイアグラム & Markdown文書のリアルタイム・プレビューア**です。   外部サーバーへの通信を一切行わない完全クライアントサイド動作で、機密性の高い設計文書やシステムフローも安全に編集・閲覧・高解像度エクスポートできます。",
   "main": "tailwind.config.js",
   "scripts": {
-    "build:css": "tailwindcss -i ./input.css -o ./tailwind.min.css --minify",
-    "watch:css": "tailwindcss -i ./input.css -o ./tailwind.min.css --watch",
+    "build:css": "tailwindcss -i ./src/input.css -o ./dist/assets/tailwind.min.css --minify",
+    "build:html": "cp src/index.html dist/index.html",
+    "build": "npm run build:css && npm run build:html",
+    "watch:css": "tailwindcss -i ./src/input.css -o ./dist/assets/tailwind.min.css --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
