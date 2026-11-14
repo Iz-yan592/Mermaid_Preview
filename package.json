@@ -1,0 +1,27 @@
+{
+  "name": "mermaid_preview",
+  "version": "1.0.0",
+  "description": "ブラウザ単体で軽快に動作する、**Mermaidダイアグラム & Markdown文書のリアルタイム・プレビューア**です。   外部サーバーへの通信を一切行わない完全クライアントサイド動作で、機密性の高い設計文書やシステムフローも安全に編集・閲覧・高解像度エクスポートできます。",
+  "main": "tailwind.config.js",
+  "scripts": {
+    "build:css": "tailwindcss -i ./input.css -o ./tailwind.min.css --minify",
+    "watch:css": "tailwindcss -i ./input.css -o ./tailwind.min.css --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Iz-yan592/Mermaid_Preview.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Iz-yan592/Mermaid_Preview/issues"
+  },
+  "homepage": "https://github.com/Iz-yan592/Mermaid_Preview#readme",
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.20",
+    "tailwindcss": "^3.4.17"
+  }
+}
