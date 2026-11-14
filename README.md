@@ -22,18 +22,18 @@ flowchart LR
 
 1. **対話ログの解析**：AIとの対話セッションの末尾に、付属のプロンプト（`Prompt_Trajectory_of_Dialogue_v4.52.md`）をそのまま送信します。
 2. **Markdown文書の生成**：AIが5段階の自己回帰プランニングに基づき、発言番号（U番号）付きの思考リファレンステーブルとMermaid構文を含んだMarkdown文書を一括出力します。
-3. **ワンタッチプレビュー**：出力されたコードをコピーし、`Mermaid & Markdown previewer_v0.9.html` に貼り付けるだけで、スマート自動判別により文書と図が美しく即座に描画されます（コードフェンスに包まれた単体図も自動抽出・展開）。
+3. **ワンタッチプレビュー**：出力されたコードをコピーし、プレビューアに貼り付けるだけで、スマート自動判別により文書と図が美しく即座に描画されます（コードフェンスに包まれた単体図も自動抽出・展開）。
 
 ---
 
 ## 🛠 コンポーネント 1：Mermaid & Markdown Previewer
 
-単一の HTML ファイル（`Mermaid & Markdown previewer_v0.9.html`）をブラウザで開くだけで即座に動作する高機能プレビュー環境です。
+GitHub Pages による Web 配信、およびローカル環境での直接起動（ZIPダウンロード等）の双方に完全対応した高機能プレビュー環境です。
 
 ### ✨ 主な機能
 
-- 🚀 **インストール不要・完全ローカル動作**
-  - Node.js やビルドツール、Webサーバーは一切不要。ダブルクリックで即時起動します。
+- 🚀 **Web公開 & 完全ローカル両対応（ゼロ構成）**
+  - Web上ではもちろん、`dist/index.html`（またはルートの `Mermaid & Markdown previewer_v0.9.html`）をブラウザで開くだけで即座に動作します。
 - 🔄 **デュアルプレビューモード**
   - **📐 Mermaid単体モード**: 自由なパン（ドラッグ移動）、滑らかなズーム（20%〜400%）、画面フィット、100%等倍リセット、エラー通知ボックス。
   - **📝 Markdown文書モード**: GFM（GitHub Flavored Markdown）完全対応。文書内に点在する複数の ` ```mermaid ` ブロックを自動抽出し、インラインカードとして一括レンダリング。
@@ -46,7 +46,7 @@ flowchart LR
 - 💾 **状態の自動保存（LocalStorage）**
   - 入力テキスト（各モード別）、選択テーマ、レイアウト設定を自動永続化。ブラウザをリロードしても作業状態を復元。
 - 🔒 **厳格なセキュリティ設計**
-  - Tailwind CSS を事前ビルドしたローカルCSS（`tailwind.min.css`）として同梱し、サプライチェーン攻撃リスクを排除。
+  - Tailwind CSS を事前ビルドした最適化CSS（`assets/tailwind.min.css`）として同梱し、サプライチェーン攻撃リスクを排除。
   - `Mermaid.js`、`Marked.js`、`DOMPurify` は SRI（`integrity="sha384-..."`）を設定したCDN配信を利用。
   - `DOMPurify` による厳格な最小権限サニタイズ（SVG要素・属性ホワイトリスト）と Mermaid の `securityLevel: 'strict'` を採用。
 
@@ -97,13 +97,13 @@ flowchart LR
 
 1. **二段階自己回帰プランニング（マクロ骨格予算配分 ＋ 行内マイクロCoT）**
    - LLMの自己回帰特性（左から右への1トークンずつの生成）による「序盤のノード枠浪費」や「未整理でのグラフ破綻」を防止するため、必ず **「0. 探索の骨格設計（フェーズ分割・ノード予算配分）」→「1. 思考リファレンステーブル」→「2. Cノード構造監査」→「3. Mermaid図」** の順序で厳密に出力します。
-2. **発言番号（U番号）と原文抜粋による厳格な根拠付け（v4.52新設）**
+2. **発言番号（U番号）と原文抜粋による厳格な根拠付け**
    - 対話履歴の各メッセージに `U1`, `U2`... と番号を振り、全ノードの根拠列にU番号と原文抜粋を必須化。AIによる事実無根のハルシネーションを抑止します。
-3. **C候補の事前仮判定による事後追認の防止（v4.52新設）**
+3. **C候補の事前仮判定による事後追認の防止**
    - 「0. 探索の骨格設計」の段階で発言番号に基づき客観的4条件（起点→触媒→摩擦→創発）を事前仮判定し、通過したものだけをCノード化。監査の形骸化を防ぎます。
 4. **自然逆算エッジ定義（先読み負荷・前方参照の完全排除）**
    - 観測された発言（`T3`：違和感）を出力した**直後の行**で、そこから逆算される論理的前提（`P1`：前提）を出力し、`P1 -. 前提 .-> T3` と結ぶ自然な上から下への生成順序を採用。
-5. **フォールバック優先順位（v4.52新設）**
+5. **フォールバック優先順位**
    - トークン上限等の制約と衝突した場合でも、「根拠の正確さ」「ID整合性」「C判定の厳格さ」を最優先として死守し、ノード数や単一ブロック制約側を安全に緩和するフォールバック階層を規定。
 6. **ID名前空間の完全分離**
    - MermaidのサブグラフIDに `Phase1`, `Phase2` プレフィックスを強制し、前提ノード（`P1`, `P2`）とのID衝突を100%防止。
@@ -116,14 +116,24 @@ flowchart LR
 
 ```text
 .
-├── Mermaid & Markdown previewer_v0.9.html     # プレビューア本体（ブラウザで直接起動可能）
-├── tailwind.min.css                           # 事前ビルド済み最適化CSS（約32KB）
+├── src/                                       # ★開発ソース
+│   ├── index.html                             # プレビューア本体
+│   └── input.css                              # Tailwind CSS 入力定義
+│
+├── dist/                                      # ★公開・配布成果物（GitHub Pages / 配布用）
+│   ├── index.html                             # 本番配信用HTML（相対パス参照）
+│   └── assets/
+│       └── tailwind.min.css                   # 最適化ビルド済みCSS（約32KB）
+│
+├── .github/
+│   └── workflows/
+│       └── deploy.yml                         # GitHub Pages 自動デプロイ設定
+│
 ├── Prompt_Trajectory_of_Dialogue_v4.52.md     # 対話ログ認知構造化プロンプト (v4.52 最新版)
 ├── archive/                                   # 過去バージョンのプロンプト等
 │   └── Prompt_Trajectory_of_daialogue_search...
-├── input.css                                  # Tailwind CSS 入力元
 ├── tailwind.config.js                         # Tailwind 設定ファイル
-├── package.json                               # スクリプト定義（npm run build:css）
+├── package.json                               # ビルドスクリプト定義
 ├── .gitignore                                 # Git 除外設定
 ├── README.md                                  # 本ドキュメント
 └── LICENSE                                    # MIT License
@@ -131,20 +141,28 @@ flowchart LR
 
 ---
 
-## 💻 開発・スタイルビルド
-
-本リポジトリのスタイルを変更・再ビルドする場合は以下のコマンドを使用します。
+## 💻 開発・ビルドコマンド
 
 ```bash
-# 依存関係のインストール（初回のみ）
+# 依存パッケージのインストール（初回のみ）
 npm install
 
-# CSSの最適化ビルド
-npm run build:css
+# 本番向けフルビルド（CSSのミニファイ + dist/ への展開）
+npm run build
 
-# 編集時の自動ビルド監視
+# CSSの変更監視（開発中）
 npm run watch:css
 ```
+
+---
+
+## 🌐 GitHub Pages への公開設定
+
+本リポジトリには GitHub Actions（`.github/workflows/deploy.yml`）が同梱されています。
+
+1. GitHub リポジトリの **Settings** → **Pages** を開きます。
+2. **Build and deployment** > **Source** で **「GitHub Actions」** を選択します。
+3. `main` ブランチにプッシュするだけで、GitHub Actions が自動で `npm run build` を実行し、`dist/` 成果物を GitHub Pages にデプロイします。
 
 ---
 
@@ -154,7 +172,7 @@ npm run watch:css
 - **ダイアグラムレンダリング**: [Mermaid.js](https://mermaid.js.org/) (v11.17.2, SRI適用)
 - **Markdown パース**: [Marked.js](https://marked.js.org/) (v15.0.7, SRI適用)
 - **HTML サニタイズ**: [DOMPurify](https://github.com/cure53/DOMPurify) (v3.2.4, SRI適用)
-- **アーキテクチャ**: 外部スクリプト未署名ロードゼロ・完全クライアントサイド SPA
+- **CI/CD**: GitHub Actions（GitHub Pages 自動デプロイ）
 
 ---
 
