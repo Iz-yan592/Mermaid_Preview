@@ -1,4 +1,7 @@
 # Mermaid & Markdown Previewer
+
+https://iz-yan592.github.io/Mermaid_Preview/
+
 > **リアルタイム構文プレビューア & AI対話ログ認知構造化ソリューション**
 
 ブラウザ単体で軽快に動作する **Mermaid & Markdown プレビューア** と、AIとの対話履歴を「共創と認知的探索の軌跡」として構造化・可視化する **対話ログ解析プロンプト（v4.52）** を統合したリポジトリです。
