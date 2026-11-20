@@ -1022,6 +1022,8 @@ graph LR
     const MIN_SCALE = 0.2;
     const MAX_SCALE = 4.0;
     const CANVAS_PADDING = 32;
+    // 方式A: 均等フィットがこの値を下回る縦長図は幅フィット＋縦パンに切り替える
+    const WIDTH_FIT_THRESHOLD = 0.5;
 
     const activePointers = new Map();
     let initialPinchDistance = null;
@@ -1081,6 +1083,27 @@ graph LR
       const availH = Math.max(containerRect.height - CANVAS_PADDING, 80);
 
       const fitScale = Math.min(availW / svgW, availH / svgH);
+      const widthScale = availW / svgW;
+
+      // 方式A（幅フィット＋縦パン）: 高さが律速して均等フィットが閾値を下回る縦長図では、
+      // 幅基準でスケールを決め、図の上端をコンテナ上端（余白 CANVAS_PADDING/2）に合わせる。
+      // 下方向は既存のドラッグ（パン）で辿れる。幅が律速する図・通常サイズの図は従来どおり均等フィット。
+      // ※従来は fitScale < MIN_SCALE のとき下限クランプで実図がコンテナより大きくなり、
+      //   中央配置＋overflow-hidden で上下が切り取られていた。
+      if (fitScale < WIDTH_FIT_THRESHOLD && widthScale > fitScale) {
+        const newScale = Math.min(Math.max(widthScale, MIN_SCALE), 1.1);
+        // 上端合わせは viewBox ではなく実表示サイズ基準にする。
+        // useMaxWidth が効く図種（状態遷移図など）は svg のレイアウト寸法が viewBox と
+        // 一致しないため、現在の倍率で割り戻した実寸から新しい倍率での表示高さを求める。
+        const rectNow = svg.getBoundingClientRect();
+        const layoutH = (rectNow.height && scale) ? rectNow.height / scale : svgH;
+        scale = newScale;
+        translateX = 0;
+        translateY = (layoutH * newScale - containerRect.height) / 2 + CANVAS_PADDING / 2;
+        updateTransform();
+        return;
+      }
+
       scale = Math.min(Math.max(fitScale, MIN_SCALE), 1.1);
       translateX = 0;
       translateY = 0;
@@ -1209,6 +1232,62 @@ graph LR
     const mdSvgCache = new Map();
     const MD_SVG_CACHE_MAX = 200;
 
+    // ノードラベルのコントラスト補正: classDef で淡色の fill だけを指定すると、
+    // ダークテーマではラベル文字がテーマ既定の淡色のまま残り、背景に埋もれて読めなくなる。
+    // ノード図形の実効 fill とラベル文字色のコントラスト比を測り、読みにくい組合せ
+    // （比が 3.0 未満）のときだけ、コントラストの高い方（濃色／淡色）へ寄せる。
+    // テーマ既定のノードや、classDef で color まで指定済みのノードは比が十分あるため対象外。
+    // 対象は図形とラベルを同じグループに持つ図種（フローチャート／状態遷移図）の g.node のみ。
+    function fixNodeLabelContrast(svgRoot) {
+      if (!svgRoot) return;
+      const DARK_TEXT = '#1e293b';
+      const LIGHT_TEXT = '#f8fafc';
+      const parseRgb = (s) => {
+        const m = /rgba?\(([^)]+)\)/.exec(s || '');
+        if (!m) return null;
+        const p = m[1].split(',').map(v => parseFloat(v));
+        return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 };
+      };
+      const luminance = ({ r, g, b }) => {
+        const f = (c) => {
+          c /= 255;
+          return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+        };
+        return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+      };
+      const contrastRatio = (l1, l2) => (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+      const darkL = luminance({ r: 30, g: 41, b: 59 });
+      const lightL = luminance({ r: 248, g: 250, b: 252 });
+
+      svgRoot.querySelectorAll('g.node').forEach((g) => {
+        const shape = [...g.children].find((el) => /^(rect|polygon|circle|ellipse|path)$/.test(el.tagName));
+        if (!shape) return;
+        const fill = parseRgb(getComputedStyle(shape).fill);
+        if (!fill || fill.a === 0) return;
+
+        const foDivs = g.querySelectorAll('foreignObject div, foreignObject span, foreignObject p');
+        const texts = g.querySelectorAll('text, tspan');
+        let labelColor = null;
+        if (foDivs.length) {
+          // 文字色は「実際に文字を持つ最深の要素」から採る。外側の div はページ側CSSの
+          // 色を継いでいるだけのことがあり（状態遷移図など）、文字色とは限らない。
+          let textBearer = null;
+          g.querySelectorAll('foreignObject *').forEach((el) => {
+            if ([...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim())) textBearer = el;
+          });
+          labelColor = parseRgb(getComputedStyle(textBearer || foDivs[0]).color);
+        } else if (texts.length) labelColor = parseRgb(getComputedStyle(texts[0]).fill);
+        if (!labelColor) return;
+
+        const fillL = luminance(fill);
+        if (contrastRatio(fillL, luminance(labelColor)) >= 3.0) return;
+
+        const target = contrastRatio(fillL, darkL) >= contrastRatio(fillL, lightL) ? DARK_TEXT : LIGHT_TEXT;
+        foDivs.forEach((el) => el.style.setProperty('color', target, 'important'));
+        texts.forEach((el) => el.style.setProperty('fill', target, 'important'));
+      });
+    }
+
     async function renderPreview(isRetry = false) {
       if (missingLibs.length > 0) {
         showCdnError();
@@ -1244,6 +1323,7 @@ graph LR
           if (currentVersion !== renderVersion) return;
 
           mermaidOutput.innerHTML = svg;
+          fixNodeLabelContrast(mermaidOutput.querySelector('svg'));
           errorBox.classList.add('hidden');
           setStatus('success', MODE_CONFIG.mermaid.successStatusText);
           retryCount = 0;
@@ -1337,6 +1417,7 @@ graph LR
 
               if (currentVersion === renderVersion) {
                 node.innerHTML = svg;
+                fixNodeLabelContrast(node.querySelector('svg'));
                 if (cardElement) cardElement.classList.remove('has-error');
               }
             } catch (err) {
