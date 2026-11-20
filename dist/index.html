@@ -1288,6 +1288,23 @@ graph LR
       });
     }
 
+    // 単体モード用: SVGの寸法をviewBox基準の明示サイズに付け替える。
+    // useMaxWidth が効く図種（ガント・状態・クラス・ER等）は Mermaid が width="100%" +
+    // style="max-width: ..." のSVGを返すため、幅が中身で決まるラッパー内では既定幅300pxに
+    // 縮んでしまい、実表示が異常に小さく、拡大時も300pxのレイヤーを引き伸ばしてぼやける。
+    // フローチャート／シーケンス図（useMaxWidth:false）と同じ明示寸法に揃えることで、
+    // フィット計算（viewBox基準）とも一致させる。Markdownモードのカードには適用しない。
+    function normalizeSvgSize(svg) {
+      if (!svg) return;
+      const vb = svg.viewBox && svg.viewBox.baseVal;
+      if (!vb || !vb.width || !vb.height) return;
+      svg.setAttribute('width', vb.width);
+      svg.setAttribute('height', vb.height);
+      svg.style.removeProperty('max-width');
+      svg.style.removeProperty('width');
+      svg.style.removeProperty('height');
+    }
+
     async function renderPreview(isRetry = false) {
       if (missingLibs.length > 0) {
         showCdnError();
@@ -1323,6 +1340,7 @@ graph LR
           if (currentVersion !== renderVersion) return;
 
           mermaidOutput.innerHTML = svg;
+          normalizeSvgSize(mermaidOutput.querySelector('svg'));
           fixNodeLabelContrast(mermaidOutput.querySelector('svg'));
           errorBox.classList.add('hidden');
           setStatus('success', MODE_CONFIG.mermaid.successStatusText);
