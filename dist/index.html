@@ -1252,10 +1252,31 @@ graph LR
     mermaidPreviewContainer.addEventListener('pointerup', handlePointerEnd);
     mermaidPreviewContainer.addEventListener('pointercancel', handlePointerEnd);
 
+    // ピンチ（ctrlKey付きwheel）と通常スクロールを区別する:
+    // ピンチはズーム、2本指スクロール／ホイールは縦方向のパン
+    function clampPanY() {
+      const svg = mermaidOutput.querySelector('svg');
+      if (!svg) return;
+      const containerH = mermaidPreviewContainer.clientHeight;
+      const contentH = svg.getBoundingClientRect().height;
+      const limit = Math.max(0, (containerH + contentH) / 2 - 80);
+      translateY = Math.min(Math.max(translateY, -limit), limit);
+    }
+
     mermaidPreviewContainer.addEventListener('wheel', (e) => {
       e.preventDefault();
-      const zoomFactor = e.deltaY < 0 ? 1.15 : 0.87;
-      zoomToPoint(scale * zoomFactor, e.clientX, e.clientY);
+      if (e.ctrlKey) {
+        const zoomFactor = e.deltaY < 0 ? 1.15 : 0.87;
+        zoomToPoint(scale * zoomFactor, e.clientX, e.clientY);
+        return;
+      }
+      let dy = e.deltaY;
+      if (e.deltaMode === 1) dy *= 16;
+      else if (e.deltaMode === 2) dy *= mermaidPreviewContainer.clientHeight;
+      if (dy === 0) return;
+      translateY -= dy;
+      clampPanY();
+      updateTransform();
     }, { passive: false });
 
     // ============================================================
