@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -156,7 +155,7 @@
       color: #e2e8f0;
     }
 
-    [data-theme="dark"]#markdownPreviewContainer :not(pre)>code {
+    [data-theme="dark"]#markdownPreviewContainer :not(pre) > code {
       background-color: #1e293b;
       color: #38bdf8;
       border: 1px solid #334155;
@@ -198,8 +197,7 @@
     <div class="max-w-7xl mx-auto px-4 py-2.5 flex flex-wrap items-center justify-between gap-3">
 
       <div class="flex items-center space-x-3">
-        <div
-          class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow-sm">
+        <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow-sm">
           M
         </div>
 
@@ -213,16 +211,25 @@
         </div>
 
         <!-- モード切替セグメントコントロール -->
-        <div class="inline-flex p-0.5 bg-slate-200/80 rounded-lg border border-slate-300 ml-2" role="tablist"
-          aria-label="プレビューモード">
-          <button type="button" id="modeMermaidBtn" role="tab" aria-selected="false"
+        <div class="inline-flex p-0.5 bg-slate-200/80 rounded-lg border border-slate-300 ml-2" role="tablist" aria-label="プレビューモード">
+          <button
+            type="button"
+            id="modeMermaidBtn"
+            role="tab"
+            aria-selected="false"
             class="px-3 py-1 text-xs font-semibold rounded-md transition-all text-slate-600 hover:text-slate-900 flex items-center gap-1.5"
-            title="Mermaid単体モード（パン・ズーム・画像保存）">
+            title="Mermaid単体モード（パン・ズーム・画像保存）"
+          >
             <span>📐</span> Mermaid
           </button>
-          <button type="button" id="modeMarkdownBtn" role="tab" aria-selected="true"
+          <button
+            type="button"
+            id="modeMarkdownBtn"
+            role="tab"
+            aria-selected="true"
             class="px-3 py-1 text-xs font-semibold rounded-md transition-all shadow-sm bg-white text-indigo-600 flex items-center gap-1.5"
-            title="Markdown文書モード（文章＋インライン図＋テーブル）">
+            title="Markdown文書モード（文章＋インライン図＋テーブル）"
+          >
             <span>📝</span> Markdown
           </button>
         </div>
@@ -232,16 +239,20 @@
       <div class="flex flex-wrap items-center gap-2">
 
         <!-- テンプレート選択 -->
-        <select id="templateSelect"
+        <select
+          id="templateSelect"
           class="text-xs sm:text-sm bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-md px-2.5 py-1.5 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          aria-label="サンプルを挿入">
+          aria-label="サンプルを挿入"
+        >
           <!-- 動的生成 -->
         </select>
 
         <!-- テーマ切り替え -->
-        <select id="themeSelect"
+        <select
+          id="themeSelect"
           class="text-xs sm:text-sm bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-md px-2.5 py-1.5 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          aria-label="テーマを選択">
+          aria-label="テーマを選択"
+        >
           <option value="default">テーマ: デフォルト</option>
           <option value="neutral">テーマ: ニュートラル</option>
           <option value="dark">テーマ: ダーク</option>
@@ -249,9 +260,13 @@
         </select>
 
         <!-- レイアウト切り替え -->
-        <button type="button" id="layoutToggleBtn"
+        <button
+          type="button"
+          id="layoutToggleBtn"
           class="hidden md:inline-flex items-center gap-1 text-xs sm:text-sm bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 font-medium px-2.5 py-1.5 rounded-md transition-colors"
-          title="上下並びと左右分割を切り替えます" aria-label="レイアウト切り替え">
+          title="上下並びと左右分割を切り替えます"
+          aria-label="レイアウト切り替え"
+        >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
           </svg>
@@ -269,8 +284,7 @@
     <div id="workspace" class="flex flex-col gap-4 flex-1">
 
       <!-- エディタセクション -->
-      <section
-        class="flex flex-col bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex-1 min-h-[260px] md:min-h-[300px]">
+      <section class="flex flex-col bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex-1 min-h-[260px] md:min-h-[300px]">
 
         <div class="bg-slate-100/80 px-4 py-2 border-b border-slate-200 flex items-center justify-between">
 
@@ -279,42 +293,48 @@
               Markdown Text
             </span>
 
-            <span id="statInfo"
-              class="text-[11px] text-slate-600 bg-white px-1.5 py-0.5 rounded border border-slate-200 font-mono">
+            <span id="statInfo" class="text-[11px] text-slate-600 bg-white px-1.5 py-0.5 rounded border border-slate-200 font-mono">
               0 行 | 0 文字
             </span>
           </div>
 
           <div class="flex items-center gap-1.5">
-            <button type="button" id="pasteBtn"
+            <button
+              type="button"
+              id="pasteBtn"
               class="text-xs text-slate-600 hover:text-indigo-600 font-medium px-2 py-1 rounded hover:bg-slate-200 transition-colors"
-              title="クリップボードから全文貼り付け（自動モード判別）">
+              title="クリップボードから貼り付け（自動モード判別）"
+            >
               ペースト
             </button>
 
-            <button type="button" id="clearBtn"
+            <button
+              type="button"
+              id="clearBtn"
               class="text-xs text-slate-600 hover:text-red-600 font-medium px-2 py-1 rounded hover:bg-slate-200 transition-colors"
-              title="内容を消去">
+              title="内容を消去"
+            >
               クリア
             </button>
           </div>
         </div>
 
         <div class="relative flex-1">
-          <textarea id="editorInput" spellcheck="false"
-            placeholder="# タイトル\n\nここにMarkdownを入力...\n\n```mermaid\ngraph TD\n    A --> B\n```"
+          <textarea
+            id="editorInput"
+            spellcheck="false"
+            placeholder="# タイトル&#10;&#10;ここにMarkdownを入力...&#10;&#10;```mermaid&#10;graph TD&#10;    A --> B&#10;```"
             class="w-full h-full min-h-[220px] p-3.5 font-mono text-xs sm:text-sm text-slate-800 bg-transparent resize-y md:resize-none focus:outline-none leading-relaxed"
-            aria-label="テキスト入力エリア"></textarea>
+            aria-label="テキスト入力エリア"
+          ></textarea>
         </div>
       </section>
 
       <!-- プレビューセクション -->
-      <section
-        class="flex flex-col bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex-1 min-h-[340px] md:min-h-[380px]">
+      <section class="flex flex-col bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex-1 min-h-[340px] md:min-h-[380px]">
 
         <!-- プレビューヘッダー -->
-        <div
-          class="bg-slate-100/80 px-4 py-2 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
+        <div class="bg-slate-100/80 px-4 py-2 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
 
           <div class="flex items-center gap-2">
             <span id="previewLabel" class="text-xs font-semibold uppercase tracking-wider text-slate-600">
@@ -322,42 +342,60 @@
             </span>
 
             <!-- ステータスバッジ（クリックでエラー図へジャンプ可能） -->
-            <button type="button" id="statusIndicator"
+            <button
+              type="button"
+              id="statusIndicator"
               class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-100 text-slate-600 border border-slate-200 transition-all cursor-default"
-              title="描画ステータス">
+              title="描画ステータス"
+            >
               入力待機
             </button>
           </div>
 
           <!-- Mermaid 専用ツールバー -->
           <div id="mermaidToolbar" class="hidden flex items-center gap-2 sm:gap-1.5">
-            <button type="button" id="zoomOutBtn"
-              class="p-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-200 rounded transition-colors" title="縮小"
-              aria-label="縮小">
+            <button
+              type="button"
+              id="zoomOutBtn"
+              class="p-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-200 rounded transition-colors"
+              title="縮小"
+              aria-label="縮小"
+            >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
               </svg>
             </button>
 
-            <button type="button" id="zoomResetBtn"
+            <button
+              type="button"
+              id="zoomResetBtn"
               class="px-2 py-1 text-xs font-mono text-slate-600 hover:text-slate-900 hover:bg-slate-200 rounded transition-colors"
-              title="表示倍率リセット" aria-label="倍率を100%にリセット">
+              title="表示倍率リセット"
+              aria-label="倍率を100%にリセット"
+            >
               <span id="zoomLevel">100%</span>
             </button>
 
-            <button type="button" id="fitBtn"
+            <button
+              type="button"
+              id="fitBtn"
               class="p-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-200 rounded transition-colors flex items-center gap-1"
-              title="画面サイズに合わせる" aria-label="画面枠内に全体表示">
+              title="画面サイズに合わせる"
+              aria-label="画面枠内に全体表示"
+            >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
               </svg>
               <span class="text-[11px] hidden sm:inline font-medium">フィット</span>
             </button>
 
-            <button type="button" id="zoomInBtn"
-              class="p-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-200 rounded transition-colors" title="拡大"
-              aria-label="拡大">
+            <button
+              type="button"
+              id="zoomInBtn"
+              class="p-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-200 rounded transition-colors"
+              title="拡大"
+              aria-label="拡大"
+            >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
               </svg>
@@ -365,44 +403,56 @@
 
             <div class="w-px h-4 bg-slate-300 mx-1"></div>
 
-            <button type="button" id="copySvgBtn"
+            <button
+              type="button"
+              id="copySvgBtn"
               class="text-xs text-slate-700 bg-white hover:bg-slate-100 border border-slate-300 font-medium px-2 py-1 rounded transition-colors"
-              title="SVGコードをコピー">
+              title="SVGコードをコピー"
+            >
               SVGコピー
             </button>
 
-            <button type="button" id="downloadSvgBtn"
+            <button
+              type="button"
+              id="downloadSvgBtn"
               class="text-xs text-slate-700 bg-white hover:bg-slate-100 border border-slate-300 font-medium px-2 py-1 rounded transition-colors"
-              title="SVG画像を保存">
+              title="SVG画像を保存"
+            >
               SVG保存
             </button>
 
-            <button type="button" id="downloadPngBtn"
+            <button
+              type="button"
+              id="downloadPngBtn"
               class="text-xs text-white bg-indigo-600 hover:bg-indigo-700 font-medium px-2.5 py-1 rounded transition-colors shadow-sm"
-              title="PNG画像を保存">
+              title="PNG画像を保存"
+            >
               PNG保存
             </button>
           </div>
 
           <!-- Markdown 専用ツールバー -->
           <div id="markdownToolbar" class="flex items-center gap-1.5">
-            <button type="button" id="copyHtmlBtn"
+            <button
+              type="button"
+              id="copyHtmlBtn"
               class="text-xs text-slate-700 bg-white hover:bg-slate-100 border border-slate-300 font-medium px-2.5 py-1 rounded transition-colors flex items-center gap-1"
-              title="レンダリングされたプレビューHTMLをコピー">
+              title="レンダリングされたプレビューHTMLをコピー"
+            >
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z">
-                </path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
               </svg>
               <span>プレビューHTMLコピー</span>
             </button>
 
-            <button type="button" id="downloadMdBtn"
+            <button
+              type="button"
+              id="downloadMdBtn"
               class="text-xs text-white bg-indigo-600 hover:bg-indigo-700 font-medium px-2.5 py-1 rounded transition-colors shadow-sm flex items-center gap-1"
-              title="Markdownファイルとしてダウンロード">
+              title="Markdownファイルとしてダウンロード"
+            >
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
               </svg>
               <span>.md保存</span>
             </button>
@@ -414,9 +464,11 @@
         <div class="relative flex-1 overflow-hidden flex flex-col">
 
           <!-- 1. Mermaid 単体パン・ズームキャンバス -->
-          <div id="mermaidPreviewContainer"
+          <div
+            id="mermaidPreviewContainer"
             class="hidden relative flex-1 overflow-hidden bg-slate-50/50 draggable-viewport flex items-center justify-center p-4 transition-colors duration-200"
-            aria-label="Mermaid図のプレビュー領域">
+            aria-label="Mermaid図のプレビュー領域"
+          >
             <!-- パン用レイヤー -->
             <div id="transformWrapper">
               <!-- ズーム用レイヤー -->
@@ -426,30 +478,34 @@
             </div>
 
             <!-- エラー通知ボックス（Mermaid単体モード用） -->
-            <div id="errorBox"
-              class="hidden absolute bottom-4 left-4 right-4 bg-red-50/95 border border-red-200 text-red-700 p-3 rounded-lg shadow-md backdrop-blur-sm z-20">
+            <div
+              id="errorBox"
+              class="hidden absolute bottom-4 left-4 right-4 bg-red-50/95 border border-red-200 text-red-700 p-3 rounded-lg shadow-md backdrop-blur-sm z-20"
+            >
               <div class="flex items-start gap-2">
-                <svg class="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor"
-                  viewBox="0 0 24 24" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                <svg
+                  class="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
                 <div class="flex-1 overflow-auto max-h-24">
                   <h4 class="text-xs font-bold">構文エラーが発生しました</h4>
-                  <p id="errorMessage"
-                    class="text-xs font-mono mt-0.5 whitespace-pre-wrap leading-relaxed text-red-600"></p>
+                  <p id="errorMessage" class="text-xs font-mono mt-0.5 whitespace-pre-wrap leading-relaxed text-red-600"></p>
                 </div>
               </div>
             </div>
 
             <!-- 初期空状態案内 -->
-            <div id="emptyGuide"
-              class="hidden absolute inset-0 flex flex-col items-center justify-center text-slate-400 pointer-events-none p-6 text-center">
-              <svg class="w-12 h-12 mb-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                  d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z">
-                </path>
+            <div
+              id="emptyGuide"
+              class="hidden absolute inset-0 flex flex-col items-center justify-center text-slate-400 pointer-events-none p-6 text-center"
+            >
+              <svg class="w-12 h-12 mb-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
               </svg>
               <p class="text-sm font-medium">Mermaid記法を入力するとリアルタイムで描画されます</p>
               <p class="text-xs mt-1 text-slate-400">右上のサンプルから各種ダイアグラムを試せます</p>
@@ -457,9 +513,11 @@
           </div>
 
           <!-- 2. Markdown 専用縦スクロール領域 -->
-          <div id="markdownPreviewContainer"
+          <div
+            id="markdownPreviewContainer"
             class="relative flex-1 overflow-y-auto p-6 md:p-8 bg-white scroll-container prose prose-slate max-w-none transition-colors duration-200"
-            aria-label="Markdown文書のプレビュー領域">
+            aria-label="Markdown文書のプレビュー領域"
+          >
             <!-- marked.js で変換された HTML が入る -->
           </div>
 
@@ -470,8 +528,10 @@
   </main>
 
   <!-- トースト通知 -->
-  <div id="toast"
-    class="fixed bottom-5 right-5 bg-slate-900 text-white text-xs px-3.5 py-2 rounded-lg shadow-lg transform translate-y-12 opacity-0 transition-all duration-200 pointer-events-none z-50">
+  <div
+    id="toast"
+    class="fixed bottom-5 right-5 bg-slate-900 text-white text-xs px-3.5 py-2 rounded-lg shadow-lg transform translate-y-12 opacity-0 transition-all duration-200 pointer-events-none z-50"
+  >
     通知メッセージ
   </div>
 
@@ -500,6 +560,9 @@
         successStatusText: '正常描画'
       }
     };
+
+    // 描画時とSVG/PNGエクスポート時でフォント幅計算を完全一致させるための共通フォントスタック
+    const EXPORT_FONT_FAMILY = '"Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic", "Meiryo", "Segoe UI", system-ui, -apple-system, sans-serif';
 
     // ============================================================
     // 厳格に構文検証されたテンプレート定義
@@ -633,8 +696,8 @@ sequenceDiagram
 | :--- | :--- | :---: | :--- |
 | **Mermaid 単体** | パン・ズーム、PNG/SVG画像出力 | ✅ | 高解像度Canvas出力 |
 | **Markdown 統合** | 見出し、表、リスト、Mermaid図のインライン描画 | ✅ | GFMテーブル対応 |
-| **スマート判別** | ペースト時にMermaidかMarkdownかを自動判定 | ✅ | 単一ブロックのフェンス自動除去対応 |
-| **安全保護** | DOMPurify による最小権限サニタイズ | ✅ | XSS / CSS Injection防御 |
+| **スマート判別** | ペースト時にMermaidかMarkdownかを自動判定 | ✅ | ワンタッチ切り替え |
+| **安全保護** | DOMPurify による厳格サニタイズ | ✅ | XSS完全防御 |
 
 > 💡 **Tip**: 入力欄の内容はブラウザ（LocalStorage）に自動保存されます。`,
 
@@ -714,6 +777,7 @@ graph LR
     let isSideBySide = false;
 
     let debounceTimer = null;
+    let resizeTimer = null;
     let renderVersion = 0;
     let renderCount = 0;
     let isInitialRender = true;
@@ -734,7 +798,7 @@ graph LR
           isSideBySide
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      } catch (_) { }
+      } catch (_) {}
     }
 
     function loadState() {
@@ -743,37 +807,6 @@ graph LR
         return raw ? JSON.parse(raw) : null;
       } catch (_) {
         return null;
-      }
-    }
-
-    // ============================================================
-    // 汎用クリップボードコピー関数（HTTPS & file:// 両対応）
-    // ============================================================
-
-    async function writeToClipboard(text, successMsg) {
-      if (navigator.clipboard && window.isSecureContext) {
-        try {
-          await navigator.clipboard.writeText(text);
-          showToast(successMsg);
-          return true;
-        } catch (_) { }
-      }
-
-      const tempArea = document.createElement('textarea');
-      tempArea.value = text;
-      tempArea.style.position = 'fixed';
-      tempArea.style.opacity = '0';
-      document.body.appendChild(tempArea);
-      tempArea.select();
-      try {
-        document.execCommand('copy');
-        showToast(successMsg);
-        document.body.removeChild(tempArea);
-        return true;
-      } catch (_) {
-        showToast('コピーに失敗しました');
-        document.body.removeChild(tempArea);
-        return false;
       }
     }
 
@@ -789,7 +822,7 @@ graph LR
     }
 
     // ============================================================
-    // Marked.js 15.0+ 完全準拠設定（プレーンオブジェクト拡張）
+    // Marked.js 15.0+ 完全準拠設定 & URL ホワイトリスト検証
     // ============================================================
 
     function escapeHtml(str) {
@@ -802,11 +835,21 @@ graph LR
         .replace(/'/g, '&#039;');
     }
 
+    function isSafeHref(value) {
+      if (!value) return false;
+      const trimmed = String(value).trim();
+      if (trimmed.startsWith('#')) return true;
+      try {
+        const url = new URL(trimmed, window.location.href);
+        return ['http:', 'https:', 'mailto:'].includes(url.protocol);
+      } catch {
+        return false;
+      }
+    }
+
     let mdMermaidCounter = 0;
 
-    // ============================================================
     // CDN 読み込みガード: ライブラリ欠落時はアプリ全体を止めない
-    // ============================================================
     const missingLibs = [];
     if (typeof mermaid === 'undefined') missingLibs.push('mermaid');
     if (typeof marked === 'undefined') missingLibs.push('marked');
@@ -824,16 +867,22 @@ graph LR
         gfm: true,
         breaks: true,
         renderer: {
+          html(token) {
+            const raw = (token && token.text) ? token.text : '';
+            return escapeHtml(raw);
+          },
+
           link(token) {
             const href = (token && token.href) ? token.href : '';
-            const text = (token && token.text) ? token.text : '';
+            const innerHtml = (token && token.tokens)
+              ? this.parser.parseInline(token.tokens)
+              : escapeHtml((token && token.text) ? token.text : '');
             const title = (token && token.title) ? ` title="${escapeHtml(token.title)}"` : '';
 
-            const cleanHref = href.trim().toLowerCase();
-            if (cleanHref.startsWith('javascript:') || cleanHref.startsWith('vbscript:') || cleanHref.startsWith('data:')) {
-              return `<span>${escapeHtml(text)}</span>`;
+            if (!isSafeHref(href)) {
+              return `<span>${innerHtml}</span>`;
             }
-            return `<a href="${escapeHtml(href)}"${title} target="_blank" rel="noopener noreferrer">${text}</a>`;
+            return `<a href="${escapeHtml(href)}"${title} target="_blank" rel="noopener noreferrer">${innerHtml}</a>`;
           },
 
           code(token) {
@@ -845,10 +894,9 @@ graph LR
               const cardId = `md-mermaid-card-${Date.now()}-${mdMermaidCounter}`;
               const outputId = `md-mermaid-output-${Date.now()}-${mdMermaidCounter}`;
 
-              // Tailwind v3 CDN 準拠クラス (backdrop-blur-sm, shadow-sm) を使用
               return `
                 <div class="not-prose markdown-mermaid-card group relative" id="${cardId}">
-                  <div class="card-action-bar absolute top-2.5 right-2.5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm p-1 rounded-md border border-slate-200 dark:border-slate-700 shadow-sm z-10">
+                  <div class="card-action-bar absolute top-2.5 right-2.5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 bg-white/90 dark:bg-slate-800/90 backdrop-blur-xs p-1 rounded-md border border-slate-200 dark:border-slate-700 shadow-xs z-10">
                     <button type="button" class="inline-svg-copy-btn text-[11px] px-1.5 py-0.5 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium rounded hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors" data-target="${outputId}" title="この図のSVGをコピー">SVGコピー</button>
                   </div>
                   <div class="inline-block text-left mermaid-diagram" id="${outputId}" data-card-id="${cardId}" data-code="${encodeURIComponent(code)}"></div>
@@ -860,18 +908,43 @@ graph LR
           }
         }
       });
-    } // end: CDN ガード（marked.use）
+    }
+
+    // 汎用クリップボードコピー関数（HTTPS & file:// フォールバック対応）
+    async function copyTextToClipboard(text, successMsg) {
+      if (navigator.clipboard && window.isSecureContext) {
+        try {
+          await navigator.clipboard.writeText(text);
+          showToast(successMsg);
+          return;
+        } catch (_) {}
+      }
+
+      const tempArea = document.createElement('textarea');
+      tempArea.value = text;
+      tempArea.style.position = 'fixed';
+      tempArea.style.opacity = '0';
+      document.body.appendChild(tempArea);
+      tempArea.select();
+      try {
+        document.execCommand('copy');
+        showToast(successMsg);
+      } catch (_) {
+        showToast('コピーに失敗しました');
+      }
+      document.body.removeChild(tempArea);
+    }
 
     // インライン図のSVGコピー
-    async function copyInlineSvg(nodeId) {
+    function copyInlineSvg(nodeId) {
       const container = document.getElementById(nodeId);
       const svg = container ? container.querySelector('svg') : null;
       if (!svg) {
         showToast('コピー可能なSVGが見つかりません');
         return;
       }
-      const svgData = new XMLSerializer().serializeToString(svg);
-      await writeToClipboard(svgData, 'インライン図のSVGをコピーしました');
+      const svgData = prepareCleanSvgForExport(svg).svgString;
+      copyTextToClipboard(svgData, 'インライン図のSVGをコピーしました');
     }
 
     markdownPreviewContainer.addEventListener('click', (e) => {
@@ -884,7 +957,7 @@ graph LR
     });
 
     // ============================================================
-    // Mermaid 初期化 (securityLevel: strict)
+    // Mermaid 初期化 (securityLevel: strict + 余裕あるノードパディング)
     // ============================================================
 
     function initMermaid(theme = 'default') {
@@ -893,11 +966,12 @@ graph LR
         startOnLoad: false,
         securityLevel: 'strict',
         theme: theme,
-        fontFamily: 'inherit',
+        fontFamily: EXPORT_FONT_FAMILY,
         suppressErrorRendering: true,
         flowchart: {
           useMaxWidth: false,
-          htmlLabels: false
+          htmlLabels: false,
+          padding: 16
         },
         sequence: {
           useMaxWidth: false
@@ -955,65 +1029,33 @@ graph LR
     }
 
     // ============================================================
-    // スマートフォーマット自動判別（AI出力の単一フェンス自動除去対応）
+    // スマートフォーマット自動判別
     // ============================================================
-
-    const MERMAID_KEYWORDS = [
-      'graph', 'flowchart', 'sequencediagram', 'classdiagram',
-      'statediagram', 'statediagram-v2', 'erdiagram', 'gantt',
-      'pie', 'mindmap', 'gitgraph', 'timeline', 'quadrantchart',
-      'requirementdiagram', 'c4context', 'sankey-beta', 'xychart-beta',
-      'block-beta', 'packet-beta', 'kanban', 'architecture-beta'
-    ];
-
-    function startsWithMermaidKeyword(text) {
-      const lines = text.trim().split('\n');
-      for (const line of lines) {
-        const cleanLine = line.trim().toLowerCase();
-        // コメント行やディレクティブ（%%{init: ...}%%）はスキップして判定
-        if (!cleanLine || cleanLine.startsWith('%%')) continue;
-        return MERMAID_KEYWORDS.some(kw => cleanLine.startsWith(kw));
-      }
-      return false;
-    }
-
-    // 生成AIが出力した「単一の ```mermaid ... ``` ブロックのみ」を検出し中身を取り出す
-    function extractSingleMermaidBlock(text) {
-      const trimmed = text.trim();
-      const match = trimmed.match(/^```(?:mermaid)?[ \t]*\r?\n([\s\S]+?)\r?\n```$/i);
-      if (!match) return null;
-
-      const inner = match[1].trim();
-      // 内部にさらにコードフェンスが含まれている場合は複数のブロックなので除外
-      if (inner.includes('```')) return null;
-
-      if (/^```mermaid/i.test(trimmed) || startsWithMermaidKeyword(inner)) {
-        return inner;
-      }
-      return null;
-    }
 
     function detectContentMode(text) {
       const trimmed = text.trim();
       if (!trimmed) return null;
 
-      if (extractSingleMermaidBlock(trimmed)) {
-        return 'mermaid';
-      }
-
       if (trimmed.includes('```mermaid') || trimmed.includes('```') || /^#{1,6}\s+/m.test(trimmed) || /\|.+\|[\r\n]+\|[-:| ]+\|/m.test(trimmed)) {
         return 'markdown';
       }
 
-      if (startsWithMermaidKeyword(trimmed)) {
-        return 'mermaid';
+      const mermaidKeywords = [
+        'graph', 'flowchart', 'sequencediagram', 'classdiagram',
+        'statediagram', 'statediagram-v2', 'erdiagram', 'gantt',
+        'pie', 'mindmap', 'gitgraph', 'timeline', 'quadrantchart'
+      ];
+      const firstLine = trimmed.split('\n')[0].trim().toLowerCase();
+      for (const kw of mermaidKeywords) {
+        if (firstLine.startsWith(kw)) {
+          return 'mermaid';
+        }
       }
-
       return null;
     }
 
     // ============================================================
-    // パン・ズーム管理
+    // パン・ズーム管理（方式A：幅フィット＋縦パン対応）
     // ============================================================
 
     let scale = 1;
@@ -1022,7 +1064,6 @@ graph LR
     const MIN_SCALE = 0.2;
     const MAX_SCALE = 4.0;
     const CANVAS_PADDING = 32;
-    // 方式A: 均等フィットがこの値を下回る縦長図は幅フィット＋縦パンに切り替える
     const WIDTH_FIT_THRESHOLD = 0.5;
 
     const activePointers = new Map();
@@ -1064,7 +1105,7 @@ graph LR
             svgW = bbox.width;
             svgH = bbox.height;
           }
-        } catch (_) { }
+        } catch (_) {}
       }
 
       if (!svgW || !svgH) {
@@ -1085,16 +1126,9 @@ graph LR
       const fitScale = Math.min(availW / svgW, availH / svgH);
       const widthScale = availW / svgW;
 
-      // 方式A（幅フィット＋縦パン）: 高さが律速して均等フィットが閾値を下回る縦長図では、
-      // 幅基準でスケールを決め、図の上端をコンテナ上端（余白 CANVAS_PADDING/2）に合わせる。
-      // 下方向は既存のドラッグ（パン）で辿れる。幅が律速する図・通常サイズの図は従来どおり均等フィット。
-      // ※従来は fitScale < MIN_SCALE のとき下限クランプで実図がコンテナより大きくなり、
-      //   中央配置＋overflow-hidden で上下が切り取られていた。
+      // 方式A（幅フィット＋縦パン）: 縦長図では横幅基準でスケールを決め、上端をコンテナ上端に揃える
       if (fitScale < WIDTH_FIT_THRESHOLD && widthScale > fitScale) {
         const newScale = Math.min(Math.max(widthScale, MIN_SCALE), 1.1);
-        // 上端合わせは viewBox ではなく実表示サイズ基準にする。
-        // useMaxWidth が効く図種（状態遷移図など）は svg のレイアウト寸法が viewBox と
-        // 一致しないため、現在の倍率で割り戻した実寸から新しい倍率での表示高さを求める。
         const rectNow = svg.getBoundingClientRect();
         const layoutH = (rectNow.height && scale) ? rectNow.height / scale : svgH;
         scale = newScale;
@@ -1201,7 +1235,7 @@ graph LR
         activePointers.delete(e.pointerId);
         try {
           mermaidPreviewContainer.releasePointerCapture(e.pointerId);
-        } catch (_) { }
+        } catch (_) {}
       }
 
       if (activePointers.size < 2) {
@@ -1223,12 +1257,12 @@ graph LR
     }, { passive: false });
 
     // ============================================================
-    // レンダリングロジック
+    // レンダリングロジック & SVG寸法正規化
     // ============================================================
 
     let retryCount = 0;
 
-    // Markdown内Mermaid図のSVGキャッシュ（コード＋テーマをキーに、変更分のみ再描画）
+    // Markdown内Mermaid図のSVGキャッシュ（FIFO/LRU管理）
     const mdSvgCache = new Map();
     const MD_SVG_CACHE_MAX = 200;
 
@@ -1288,12 +1322,7 @@ graph LR
       });
     }
 
-    // 単体モード用: SVGの寸法をviewBox基準の明示サイズに付け替える。
-    // useMaxWidth が効く図種（ガント・状態・クラス・ER等）は Mermaid が width="100%" +
-    // style="max-width: ..." のSVGを返すため、幅が中身で決まるラッパー内では既定幅300pxに
-    // 縮んでしまい、実表示が異常に小さく、拡大時も300pxのレイヤーを引き伸ばしてぼやける。
-    // フローチャート／シーケンス図（useMaxWidth:false）と同じ明示寸法に揃えることで、
-    // フィット計算（viewBox基準）とも一致させる。Markdownモードのカードには適用しない。
+    // 単体モード用: SVGの寸法をviewBox基準の明示サイズに正規化
     function normalizeSvgSize(svg) {
       if (!svg) return;
       const vb = svg.viewBox && svg.viewBox.baseVal;
@@ -1382,12 +1411,16 @@ graph LR
         try {
           const rawHtml = marked.parse(code);
 
-          // DOMPurify 最小権限設定:
-          // MermaidのSVG本体はサニタイズ後に挿入されるため、ここではプレースホルダー維持と
-          // 安全な外部リンク属性のみを許可し、styleタグ等によるUI偽装・CSSインジェクションを遮断する
+          // セキュリティ改善: Mermaid描画前のサニタイズでは <style> / <foreignObject> 等を厳格に禁止
           const cleanHtml = DOMPurify.sanitize(rawHtml, {
-            ADD_TAGS: ['button'],
-            ADD_ATTR: ['data-card-id', 'data-code', 'data-target', 'target', 'rel']
+            ADD_TAGS: ['button', 'input'],
+            ADD_ATTR: [
+              'id', 'class', 'data-card-id', 'data-code', 'data-target',
+              'target', 'rel', 'title', 'align', 'colspan', 'rowspan',
+              'type', 'checked', 'disabled'
+            ],
+            FORBID_TAGS: ['script', 'style', 'iframe', 'object', 'embed', 'foreignObject'],
+            FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'srcdoc']
           });
 
           if (currentVersion !== renderVersion) return;
@@ -1407,16 +1440,18 @@ graph LR
           let errorCount = 0;
           setStatus('rendering', `図を描画中 (0/${totalDiagrams})...`);
 
+          let diagramIndex = 0;
           for (const node of mermaidNodes) {
             if (currentVersion !== renderVersion) return;
 
+            diagramIndex++;
             const diagramCode = decodeURIComponent(node.getAttribute('data-code') || '');
             const cardId = node.getAttribute('data-card-id');
             const cardElement = cardId ? document.getElementById(cardId) : node.closest('.markdown-mermaid-card');
 
             if (!diagramCode) continue;
 
-            const cacheKey = currentTheme + '\n' + diagramCode;
+            const cacheKey = `${currentTheme}:${diagramIndex}\n${diagramCode}`;
             const cachedSvg = mdSvgCache.get(cacheKey);
 
             try {
@@ -1428,7 +1463,10 @@ graph LR
                 const diagramId = `md-mermaid-${Date.now()}-${renderCount}`;
                 const rendered = await mermaid.render(diagramId, diagramCode);
                 svg = rendered.svg;
-                if (mdSvgCache.size >= MD_SVG_CACHE_MAX) mdSvgCache.clear();
+                if (mdSvgCache.size >= MD_SVG_CACHE_MAX) {
+                  const oldestKey = mdSvgCache.keys().next().value;
+                  mdSvgCache.delete(oldestKey);
+                }
                 mdSvgCache.set(cacheKey, svg);
               }
               cleanupMermaidGarbage();
@@ -1545,6 +1583,8 @@ graph LR
     // ============================================================
 
     function switchMode(newMode, notify = true, preserveInput = false) {
+      clearTimeout(debounceTimer);
+
       if (!preserveInput) {
         if (currentMode === 'mermaid') {
           mermaidCode = editorInput.value;
@@ -1604,7 +1644,7 @@ graph LR
     modeMarkdownBtn.addEventListener('click', () => switchMode('markdown', true));
 
     // ============================================================
-    // テーマ & レイアウト
+    // テーマ & レイアウト & リサイズ連動
     // ============================================================
 
     function applyCanvasTheme(theme) {
@@ -1656,6 +1696,14 @@ graph LR
       }, 60);
     });
 
+    window.addEventListener('resize', () => {
+      if (currentMode !== 'mermaid') return;
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        fitToScreen();
+      }, 150);
+    });
+
     templateSelect.addEventListener('change', (e) => {
       const key = e.target.value;
       if (currentMode === 'mermaid') {
@@ -1679,47 +1727,80 @@ graph LR
     });
 
     // ============================================================
-    // エディタ操作 & スマートペースト処理
+    // エディタ操作 & エクスポート（文字見切れ防止パディング・フォント統一）
     // ============================================================
 
-    // 全文貼り付け時の共通ハンドラ（単一Mermaidブロックのフェンス除去＋自動モード切替）
-    function applyFullTextPaste(rawText, notifyModeSwitch = true) {
-      const singleMermaid = extractSingleMermaidBlock(rawText);
-      if (singleMermaid) {
-        editorInput.value = singleMermaid;
-        mermaidCode = singleMermaid;
-        if (currentMode !== 'mermaid') {
-          switchMode('mermaid', false, true);
-        }
-        renderPreview().then(() => fitToScreen());
-        saveState();
-        showToast('Mermaidコードブロックを検出し、単体モードで展開しました');
-        return;
-      }
+    /**
+     * SVGエクスポート・PNG変換用にviewBox余白とフォント定義を最適化したクリーンなSVGを生成する
+     */
+    function prepareCleanSvgForExport(svgElement, includeBackground = false) {
+      let minX = 0;
+      let minY = 0;
+      let width = 0;
+      let height = 0;
 
-      editorInput.value = rawText;
-      const detected = detectContentMode(rawText);
-
-      if (detected && detected !== currentMode) {
-        if (detected === 'mermaid') {
-          mermaidCode = rawText;
-        } else {
-          markdownCode = rawText;
-        }
-        switchMode(detected, notifyModeSwitch, true);
-        if (detected === 'mermaid') {
-          setTimeout(() => fitToScreen(), 50);
-        }
+      if (svgElement.viewBox && svgElement.viewBox.baseVal && svgElement.viewBox.baseVal.width > 0) {
+        minX = svgElement.viewBox.baseVal.x;
+        minY = svgElement.viewBox.baseVal.y;
+        width = svgElement.viewBox.baseVal.width;
+        height = svgElement.viewBox.baseVal.height;
       } else {
-        if (currentMode === 'mermaid') {
-          mermaidCode = rawText;
-          renderPreview().then(() => fitToScreen());
-        } else {
-          markdownCode = rawText;
-          renderPreview();
-        }
+        try {
+          const bbox = svgElement.getBBox();
+          minX = bbox.x;
+          minY = bbox.y;
+          width = bbox.width;
+          height = bbox.height;
+        } catch (_) {}
       }
-      saveState();
+
+      if (!width || !height) {
+        const rect = svgElement.getBoundingClientRect();
+        width = rect.width / (scale || 1);
+        height = rect.height / (scale || 1);
+      }
+
+      if (!width || !height) {
+        width = 800;
+        height = 600;
+      }
+
+      // 四方に十分な安全余白を追加（負のviewBox座標や右端文字の見切れを防止）
+      const margin = 16;
+      const paddedMinX = Math.floor(minX - margin);
+      const paddedMinY = Math.floor(minY - margin);
+      const paddedWidth = Math.ceil(width + margin * 2);
+      const paddedHeight = Math.ceil(height + margin * 2);
+
+      const clonedSvg = svgElement.cloneNode(true);
+      clonedSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+      clonedSvg.setAttribute('xmlns:xhtml', 'http://www.w3.org/1999/xhtml');
+      clonedSvg.setAttribute('viewBox', `${paddedMinX} ${paddedMinY} ${paddedWidth} ${paddedHeight}`);
+      clonedSvg.setAttribute('width', `${paddedWidth}px`);
+      clonedSvg.setAttribute('height', `${paddedHeight}px`);
+      clonedSvg.style.removeProperty('max-width');
+
+      // 描画時と完全に同一のフォントスタックを適用し、文字幅の膨張による見切れを防ぐ
+      const style = document.createElement('style');
+      const bgRule = includeBackground
+        ? `background-color: ${currentTheme === 'dark' ? '#0f172a' : '#ffffff'};`
+        : '';
+      style.textContent = `
+        svg, text, tspan, .label, .nodeLabel, .edgeLabel {
+          font-family: ${EXPORT_FONT_FAMILY} !important;
+        }
+        svg { ${bgRule} }
+      `;
+      clonedSvg.insertBefore(style, clonedSvg.firstChild);
+
+      let svgString = new XMLSerializer().serializeToString(clonedSvg);
+      svgString = svgString.replace(/<br>/gi, '<br/>');
+
+      return {
+        svgString,
+        width: paddedWidth,
+        height: paddedHeight
+      };
     }
 
     editorInput.addEventListener('input', scheduleRender);
@@ -1728,30 +1809,9 @@ graph LR
       const pasteData = (e.clipboardData || window.clipboardData).getData('text');
       if (!pasteData) return;
 
-      // エディタが空の状態、または全選択して全文を上書きするペーストかどうかを判定
-      const currentVal = editorInput.value;
-      const isReplacingAll =
-        currentVal.trim() === '' ||
-        (editorInput.selectionStart === 0 && editorInput.selectionEnd === currentVal.length);
-
-      // 一部追記（部分ペースト）の場合はモードの自動切替を行わず、通常のテキスト挿入に任せる
-      if (!isReplacingAll) return;
-
-      const singleMermaid = extractSingleMermaidBlock(pasteData);
-      if (singleMermaid) {
-        e.preventDefault();
-        applyFullTextPaste(pasteData, true);
-        return;
-      }
-
       const detected = detectContentMode(pasteData);
       if (detected && detected !== currentMode) {
-        setTimeout(() => {
-          switchMode(detected, true, true);
-          if (detected === 'mermaid') {
-            setTimeout(() => fitToScreen(), 50);
-          }
-        }, 0);
+        setTimeout(() => switchMode(detected, true, true), 0);
       }
     });
 
@@ -1823,14 +1883,14 @@ graph LR
     zoomResetBtn.addEventListener('click', resetView);
     fitBtn.addEventListener('click', fitToScreen);
 
-    copySvgBtn.addEventListener('click', async () => {
+    copySvgBtn.addEventListener('click', () => {
       const svgElement = mermaidOutput.querySelector('svg');
       if (!svgElement) {
         showToast('コピー可能な図がありません');
         return;
       }
-      const svgData = new XMLSerializer().serializeToString(svgElement);
-      await writeToClipboard(svgData, 'SVGコードをクリップボードにコピーしました');
+      const { svgString } = prepareCleanSvgForExport(svgElement, false);
+      copyTextToClipboard(svgString, 'SVGコードをクリップボードにコピーしました');
     });
 
     downloadSvgBtn.addEventListener('click', () => {
@@ -1839,8 +1899,8 @@ graph LR
         showToast('保存可能な図がありません');
         return;
       }
-      const svgData = new XMLSerializer().serializeToString(svgElement);
-      const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+      const { svgString } = prepareCleanSvgForExport(svgElement, false);
+      const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const downloadLink = document.createElement('a');
       downloadLink.href = url;
@@ -1849,13 +1909,12 @@ graph LR
       downloadLink.click();
       document.body.removeChild(downloadLink);
 
-      // Android対策: すぐにURLを破棄せず、ダウンロード完了を待つタイムラグを設ける
       setTimeout(() => URL.revokeObjectURL(url), 1000);
       showToast('SVG画像をダウンロードしました');
     });
 
     // ============================================================
-    // 堅牢なPNG画像エクスポート処理 (SVG -> Canvas 余白付き変換)
+    // 堅牢なPNG画像エクスポート処理 (SVG -> Canvas 変換)
     // ============================================================
     downloadPngBtn.addEventListener('click', () => {
       const svgElement = mermaidOutput.querySelector('svg');
@@ -1864,50 +1923,9 @@ graph LR
         return;
       }
 
-      let svgW = 0;
-      let svgH = 0;
+      const { svgString, width, height } = prepareCleanSvgForExport(svgElement, true);
 
-      if (svgElement.viewBox && svgElement.viewBox.baseVal && svgElement.viewBox.baseVal.width > 0) {
-        svgW = svgElement.viewBox.baseVal.width;
-        svgH = svgElement.viewBox.baseVal.height;
-      } else {
-        try {
-          const bbox = svgElement.getBBox();
-          svgW = bbox.width;
-          svgH = bbox.height;
-        } catch (_) { }
-      }
-
-      if (!svgW || !svgH) {
-        const rect = svgElement.getBoundingClientRect();
-        svgW = rect.width / (scale || 1);
-        svgH = rect.height / (scale || 1);
-      }
-
-      if (!svgW || !svgH) {
-        svgW = 800;
-        svgH = 600;
-      }
-
-      svgW = Math.ceil(svgW);
-      svgH = Math.ceil(svgH);
-      const margin = 20;
-
-      const clonedSvg = svgElement.cloneNode(true);
-      clonedSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-      clonedSvg.setAttribute('xmlns:xhtml', 'http://www.w3.org/1999/xhtml');
-      clonedSvg.setAttribute('width', svgW + 'px');
-      clonedSvg.setAttribute('height', svgH + 'px');
-
-      const bgColor = currentTheme === 'dark' ? '#0f172a' : '#ffffff';
-      const style = document.createElement('style');
-      style.textContent = `svg { background-color: ${bgColor}; font-family: sans-serif; }`;
-      clonedSvg.insertBefore(style, clonedSvg.firstChild);
-
-      let svgData = new XMLSerializer().serializeToString(clonedSvg);
-      svgData = svgData.replace(/<br\s*>/gi, '<br/>');
-
-      const encodedData = encodeURIComponent(svgData)
+      const encodedData = encodeURIComponent(svgString)
         .replace(/'/g, '%27')
         .replace(/"/g, '%22');
       const dataUrl = 'data:image/svg+xml;charset=utf-8,' + encodedData;
@@ -1916,25 +1934,15 @@ graph LR
       img.crossOrigin = 'anonymous';
 
       img.onload = () => {
-        const scaleFactor = 2; // 高解像度出力 (2x)
-        const totalW = svgW + margin * 2;
-        const totalH = svgH + margin * 2;
-
+        const scaleFactor = 2;
         const canvas = document.createElement('canvas');
-        canvas.width = totalW * scaleFactor;
-        canvas.height = totalH * scaleFactor;
+        canvas.width = width * scaleFactor;
+        canvas.height = height * scaleFactor;
 
         const ctx = canvas.getContext('2d');
-        ctx.fillStyle = bgColor;
+        ctx.fillStyle = currentTheme === 'dark' ? '#0f172a' : '#ffffff';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        // Canvas上で周囲に均等なマージンを確保して描画
-        ctx.drawImage(
-          img,
-          margin * scaleFactor,
-          margin * scaleFactor,
-          svgW * scaleFactor,
-          svgH * scaleFactor
-        );
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
         canvas.toBlob((blob) => {
           if (!blob) {
@@ -1961,22 +1969,20 @@ graph LR
       img.src = dataUrl;
     });
 
-    // プレビューHTMLコピー（UI用ボタンや内部管理用の属性を除去してクリーンなHTMLを出力）
-    copyHtmlBtn.addEventListener('click', async () => {
-      if (!markdownPreviewContainer.innerHTML || !editorInput.value.trim()) {
+    copyHtmlBtn.addEventListener('click', () => {
+      if (!markdownPreviewContainer.innerHTML.trim()) {
         showToast('コピー可能なプレビューがありません');
         return;
       }
 
       const clone = markdownPreviewContainer.cloneNode(true);
       clone.querySelectorAll('.card-action-bar').forEach(el => el.remove());
-      clone.querySelectorAll('[data-code], [data-card-id]').forEach(el => {
+      clone.querySelectorAll('[data-code]').forEach(el => {
         el.removeAttribute('data-code');
         el.removeAttribute('data-card-id');
       });
 
-      const cleanHtmlContent = clone.innerHTML.trim();
-      await writeToClipboard(cleanHtmlContent, 'プレビューHTMLコードをコピーしました');
+      copyTextToClipboard(clone.innerHTML.trim(), 'プレビューHTMLコードをコピーしました');
     });
 
     downloadMdBtn.addEventListener('click', () => {
@@ -2023,10 +2029,21 @@ graph LR
         }
 
         if (text) {
-          applyFullTextPaste(text, false);
-          if (!extractSingleMermaidBlock(text)) {
-            showToast('貼り付けました');
+          editorInput.value = text;
+          const detected = detectContentMode(text);
+          if (detected && detected !== currentMode) {
+            switchMode(detected, false, true);
+          } else {
+            if (currentMode === 'mermaid') {
+              mermaidCode = text;
+              renderPreview().then(() => fitToScreen());
+            } else {
+              markdownCode = text;
+              renderPreview();
+            }
           }
+          saveState();
+          showToast('貼り付けました');
         }
       } catch (_) {
         editorInput.focus();
@@ -2046,7 +2063,7 @@ graph LR
       if (document.fonts) {
         try {
           await document.fonts.ready;
-        } catch (_) { }
+        } catch (_) {}
       }
 
       const saved = loadState();
@@ -2070,5 +2087,4 @@ graph LR
     });
   </script>
 </body>
-
 </html>
